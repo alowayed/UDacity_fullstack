@@ -13,14 +13,31 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    DB = connect()
+    c = DB.cursor()
+    c.execute("DELETE FROM matches;")
+    DB.commit()
+    DB.close()
+
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-
+    deleteMatches()
+    DB = connect()
+    c = DB.cursor()
+    c.execute("DELETE FROM players;")
+    DB.commit()
+    DB.close()
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    DB = connect()
+    c = DB.cursor()
+    c.execute("SELECT COUNT(*) AS num FROM players;")
+    player_sum = c.fetchall()[0][0]
+    DB.close()
+    return player_sum
 
 
 def registerPlayer(name):
@@ -32,6 +49,11 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    DB = connect()
+    c = DB.cursor()
+    c.execute("INSERT INTO players(name) VALUES (%s)", (name,))
+    DB.commit()
+    DB.close()
 
 
 def playerStandings():
@@ -47,7 +69,12 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-
+    DB = connect()
+    c = DB.cursor()
+    c.execute("SELECT * FROM id_N_W_rounds;")
+    ans = c.fetchall()
+    DB.close
+    return ans
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -56,6 +83,11 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    DB = connect()
+    c = DB.cursor()
+    c.execute("INSERT INTO matches VALUES (" + str(winner) +","+ str(loser) + ");")
+    DB.commit()
+    DB.close()
  
  
 def swissPairings():
@@ -73,5 +105,14 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-
-
+    standings = playerStandings()
+    print "standings: " + str(standings)
+    ans = []
+    i = 0
+    while i < len(standings):
+        print "here 1"
+        ans.append((standings[i][0], standings[i][1], standings[i+1][0], standings[i+1][1]))
+        i=i+2
+        print "ans: " + str(ans)
+        print "i is: " + str(i)
+    return ans
